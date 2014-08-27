@@ -66,14 +66,12 @@ Downloader.get(url, [opts])
 **opts**: object, optional, Options for request
 
 
-
 Downloader.run(cb) 
 -----------------------------
 
 **Parameters**
 
 **cb**: RunCallback
-
 
 
 Type Definitions
@@ -99,5 +97,8 @@ ErrorHash
 
 | Name | Type | Description |
 |------|------|-------------|
-| url | Url | link |
+| url | String | link |
 | error | Error | Error object |
+
+# TODO
+* post requests
