@@ -33,7 +33,10 @@ d.run(function(err, res){
 
 ## API
 
-download(urls, [opts], callback)
+Methods
+===
+
+download(urls, [opts], cb)
 -----------------------------
 Download array of urls
 
@@ -43,7 +46,7 @@ Download array of urls
 
 **opts**: object, optional, Options for request
 
-**cb**: callback
+**cb**: RunCallback
 
 new Downloader([opts])
 -----------------------------
@@ -71,3 +74,30 @@ Downloader.run(cb)
 
 **cb**: RunCallback
 
+
+
+Type Definitions
+===
+
+RunCallback(err, result)
+-----------------------------
+
+**Parameters**
+
+| Name | Type | Description |
+|------|------|-------------|
+| err | null : Array.&lt;ErrorHash&gt; | Array of errors |
+| result | Array.&lt;ResultHash&gt; | Callback with downloaded data |
+
+
+ErrorHash
+-----------------------------
+
+**Type**: object
+
+**Properties**
+
+| Name | Type | Description |
+|------|------|-------------|
+| url | Url | link |
+| error | Error | Error object |
