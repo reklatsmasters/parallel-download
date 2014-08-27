@@ -1,0 +1,28 @@
+{
+  "name": "parallel-download",
+  "version": "0.0.0",
+  "description": "0.1.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/reklatsmasters/parallel-download.git"
+  },
+  "keywords": [
+    "parallel",
+    "download"
+  ],
+  "author": "Dmitry Tsvettsikh",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/reklatsmasters/parallel-download/issues"
+  },
+  "homepage": "https://github.com/reklatsmasters/parallel-download",
+  "dependencies": {
+    "object-assign": "^1.0.0",
+    "request": "^2.40.0",
+    "run-parallel": "^1.0.0"
+  }
+}
