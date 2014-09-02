@@ -1,4 +1,4 @@
-var parallel = require('run-parallel')
+var parallel = require('./parallel')
 	, request = require("request")
 	, assign = require('object-assign');
 	;

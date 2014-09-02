@@ -22,7 +22,6 @@
   "homepage": "https://github.com/reklatsmasters/parallel-download",
   "dependencies": {
     "object-assign": "^1.0.0",
-    "request": "^2.40.0",
-    "run-parallel": "^1.0.0"
+    "request": "^2.40.0"
   }
 }
