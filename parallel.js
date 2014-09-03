@@ -14,7 +14,7 @@ module.exports = function (tasks, cb) {
     	errors.push(err);
     }
     if (--pending === 0) {
-      cb && cb(errors, results)
+      cb && cb(errors.length ? errors : null, results)
       cb = null
     }
   }
