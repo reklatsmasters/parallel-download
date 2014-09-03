@@ -10,6 +10,7 @@ var parallel = require('./parallel')
 function Downloader(opts) {
 	this.opts = opts || {};
 	this.opts.encoding = null;
+	this.tasks = [];
 };
 
 Downloader.prototype = function() {
@@ -17,8 +18,6 @@ Downloader.prototype = function() {
 	var scope = {
 		constructor: Downloader
 	};
-
-	var tasks = [];
 
 	var generator = {
 		get: function(url, opts) {
@@ -55,10 +54,10 @@ Downloader.prototype = function() {
 		opts = assign({}, this.opts, opts);
 
 		if (typeof url === "string") {
-			tasks.push( generator.get(url, opts) );
+			this.tasks.push( generator.get(url, opts) );
 		} else if (Array.isArray(url)) {
 			url.forEach(function(item){
-				tasks.push( generator.get(item, opts) );
+				this.tasks.push( generator.get(item, opts) );
 			});
 		}
 		return this;
