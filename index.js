@@ -88,9 +88,7 @@ Downloader.prototype = function() {
 	 * @param {RunCallback} cb
 	 */
 	scope.run = function(cb) {
-		parallel(tasks, function(err, out) {
-			cb(err, out.filter(function(item){ return !!item; }));
-		});
+		parallel(tasks, cb);
 	};
 
 	return scope;
