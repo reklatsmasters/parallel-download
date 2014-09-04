@@ -22,7 +22,9 @@ Downloader.prototype = function() {
 	var generator = {
 		get: function(url, opts) {
 			return function(cb) {
-				var data = [];
+				var data = []
+					, name = null
+					;
 
 				request.get(url, opts)
 				.on("error", function(err){
@@ -36,9 +38,16 @@ Downloader.prototype = function() {
 						cb({url:url, error: new Error(res.statusCode)});
 						return;
 					}
+
+					if (res.headers.hasOwnProperty("content-disposition")) {
+						var attach = res.headers["content-disposition"];
+						var posLeft = attach.indexOf('"');
+
+						name = attach.slice(posLeft+1, -1);
+					}
 				})
 				.on("end", function() {
-					cb(null, {url:url, content:Buffer.concat(data)});
+					cb(null, {url:url, filename:name, content:Buffer.concat(data)});
 				});
 			};
 		}
@@ -58,7 +67,7 @@ Downloader.prototype = function() {
 		} else if (Array.isArray(url)) {
 			url.forEach(function(item){
 				this.tasks.push( generator.get(item, opts) );
-			});
+			}, this);
 		}
 		return this;
 	};
@@ -68,6 +77,7 @@ Downloader.prototype = function() {
 	 * @type {object}
 	 * @property {Url} url
 	 * @property {Buffer} content - Downloaded data
+	 * @property {null|String} filename - File name from `content-disposition` header
 	 */
 
 	 /**
@@ -87,7 +97,7 @@ Downloader.prototype = function() {
 	 * @param {RunCallback} cb
 	 */
 	scope.run = function(cb) {
-		parallel(tasks, cb);
+		parallel(this.tasks, cb);
 	};
 
 	return scope;
