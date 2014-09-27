@@ -1,6 +1,8 @@
+'use strict';
+
 var parallel = require('./parallel')
 	, request = require("request")
-	, assign = require('object-assign');
+	, assign = require('object-assign')
 	;
 
 /**
@@ -10,8 +12,9 @@ var parallel = require('./parallel')
 function Downloader(opts) {
 	this.opts = opts || {};
 	this.opts.encoding = null;
+	this.opts.timeout = ('timeout' in this.opts) ? this.opts.timeout : 60*1000;
 	this.tasks = [];
-};
+}
 
 Downloader.prototype = function() {
 
@@ -19,38 +22,37 @@ Downloader.prototype = function() {
 		constructor: Downloader
 	};
 
-	var generator = {
-		get: function(url, opts) {
-			return function(cb) {
-				var data = []
-					, name = null
-					;
+	var generator = function(url, opts) {
+		// task func
+		return function(cb) {
+			var data = []
+				, name = null
+				;
 
-				request.get(url, opts)
-				.on("error", function(err){
-					cb({url:url, error:err});
-				})
-				.on("data", function(chunk){
-					data.push(chunk);
-				})
-				.on('response', function (res) {
-					if (res.statusCode < 200 || res.statusCode >= 300) {
-						cb({url:url, error: new Error(res.statusCode)});
-						return;
-					}
+			request.get(url, opts)
+			.on("error", function(err){
+				cb({url:url, error:err});
+			})
+			.on("data", function(chunk){
+				data.push(chunk);
+			})
+			.on('response', function (res) {
+				if (res.statusCode < 200 || res.statusCode >= 300) {
+					cb({url:url, error: new Error(res.statusCode)});
+					return;
+				}
 
-					if (res.headers.hasOwnProperty("content-disposition")) {
-						var attach = res.headers["content-disposition"];
-						var posLeft = attach.indexOf('"');
+				if (res.headers.hasOwnProperty("content-disposition")) {
+					var attach = res.headers["content-disposition"];
+					var posLeft = attach.indexOf('"');
 
-						name = attach.slice(posLeft+1, -1);
-					}
-				})
-				.on("end", function() {
-					cb(null, {url:url, filename:name, content:Buffer.concat(data)});
-				});
-			};
-		}
+					name = attach.slice(posLeft+1, -1);
+				}
+			})
+			.on("end", function() {
+				cb(null, {url:url, filename:name, content:Buffer.concat(data)});
+			});
+		};
 	};
 
 	/* @typedef {string} Url */
@@ -63,12 +65,15 @@ Downloader.prototype = function() {
 		opts = assign({}, this.opts, opts);
 
 		if (typeof url === "string") {
-			this.tasks.push( generator.get(url, opts) );
+			this.tasks.push( generator(url, opts) );
 		} else if (Array.isArray(url)) {
 			url.forEach(function(item){
-				this.tasks.push( generator.get(item, opts) );
+				this.tasks.push( generator(item, opts) );
 			}, this);
+		} else {
+			throw new TypeError("Argiment 1: expected string or array");
 		}
+
 		return this;
 	};
 
@@ -110,13 +115,14 @@ Downloader.prototype = function() {
  * @param {RunCallback} cb  
  */
 function download(urls, opts, cb) {
+	/*jshint validthis:true */
 	if (this instanceof download) {
 		opts = opts || urls;
 		return new Downloader(opts);
 	}
 
 	if (!Array.isArray(urls) && (typeof urls !== "string")) {
-		throw new TypeError("Expected url or array of urls");
+		throw new TypeError("Expected string or array");
 	}
 
 	if (typeof opts === "function") {
