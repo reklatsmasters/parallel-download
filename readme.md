@@ -99,6 +99,3 @@ ErrorHash
 |------|------|-------------|
 | url | String | link |
 | error | Error | Error object |
-
-# TODO
-* post requests
