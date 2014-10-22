@@ -8,6 +8,8 @@ npm install parallel-download
 ```
 
 ## usage 
+
+### Simple download
 ```js
 var download = require("parallel-download");
 
@@ -19,15 +21,39 @@ download(["http://example.com/1.txt", "http://example.com/2.txt"], function(err,
 })
 ```
 
+### Object-oriented download and options
 ```js
 var Download = require("parallel-download");
 
 var d = new Download({timeout:30*1000});
 d.get("http://example.com/1.txt");
-d.get("http://example.com/2.txt");
+d.get("http://example.com/2.txt", {timeout:120*1000});
 // OR d.get(["http://example.com/1.txt", "http://example.com/2.txt"]);
 d.run(function(err, res){
 	// ...
+});
+```
+
+### Streams
+```js
+var Memorystream = require('memory-stream');
+var fs           = require('fs');
+var Download     = require("parallel-download");
+
+var memstream = new Memorystream();
+var fstream = fs.createWriteStream('avatar.png');
+
+var d = new Download();
+
+d.get("http://example.com/1.txt", {stream:memstream});
+d.get("http://example.com/2.png", {stream:fstream});
+
+memstream.on("finish", function(){
+	console.log( memstream.toBuffer() );
+});
+
+d.run(function(error, success){
+	// all done
 });
 ```
 
@@ -73,6 +99,19 @@ Downloader.run(cb)
 
 **cb**: RunCallback
 
+Options
+===
+
+All [request](https://github.com/mikeal/request) options
+
+stream
+-----------------------------
+**WriteStream**  Default is [memory-stream](https://github.com/tommymessbauer/memory-stream)
+
+
+maxSize
+-----------------------------
+**Number** The maximum admissible size of the accepted data. Exceeding this limit all callbacks for the event `finish` removed and the download stops (only for this url).
 
 Type Definitions
 ===
@@ -99,3 +138,16 @@ ErrorHash
 |------|------|-------------|
 | url | String | link |
 | error | Error | Error object |
+
+ResultHash
+-----------------------------
+
+**Type**: object
+
+**Properties**
+
+| Name | Type | Description |
+|------|------|-------------|
+| url | String | link |
+| content | Buffer | Downloaded data or empty Buffer when used external stream |
+|filename | null : String | File name from `content-disposition` header |
