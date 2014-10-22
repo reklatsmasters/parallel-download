@@ -4,7 +4,7 @@
   "description": "Parallel downloads files to the buffer.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node ./node_modules/mocha/bin/mocha -r should -R spec"
   },
   "repository": {
     "type": "git",
@@ -24,5 +24,9 @@
     "memory-stream": "0.0.3",
     "object-assign": "^1.0.0",
     "request": "^2.40.0"
+  },
+  "devDependencies": {
+    "mocha": "^1.21.5",
+    "should": "^4.1.0"
   }
 }
