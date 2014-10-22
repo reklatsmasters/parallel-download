@@ -23,13 +23,19 @@ var generator = function(url, opts) {
 	return function(cb) {
 		var memstream = new MemoryStream()
 			, name = null
+			, maxSize = 0
 			;
+
+		if (typeof opts.maxSize === 'number' && opts.maxSize > 0) {
+			maxSize = opts.maxSize;
+			delete opts.maxSize;
+		}
 
 		memstream.on('finish', function() {
 			cb(null, {url:url, filename:name, content:memstream.toBuffer()});
 		});
 
-		request.get(url, opts)
+		var httpreq = request.get(url, opts)
 		.on("error", function(err){
 			cb({url:url, error:err});
 		})
@@ -45,6 +51,28 @@ var generator = function(url, opts) {
 				name = attach.slice(posLeft+1, -1);
 			}
 
+			if (maxSize > 0) {
+				var size = 0;
+				var dataListener = function(chunk) {
+					var part = Buffer.isBuffer(chunk) ? chunk : new Buffer(chunk);
+					size += part.length;
+
+					if (size > maxSize) {
+						httpreq.abort();
+
+						res.unpipe(memstream);
+						res.removeListener('data', dataListener);
+
+						memstream.removeAllListeners();
+						memstream = null;
+
+						return cb({url:url, error:new Error('Exceeds the maximum allowable size of the buffer')});
+					}
+				};
+
+				res.on('data', dataListener);
+			}
+
 			res.pipe(memstream);
 		})
 		;
@@ -58,13 +86,11 @@ var generator = function(url, opts) {
  * @param {object} [opts] - Options for <request>
  */
 Downloader.prototype.get = function(url, opts) {
-	opts = assign({}, this.opts, opts);
-
 	if (typeof url === "string") {
-		this.tasks.push( generator(url, opts) );
+		this.tasks.push( generator(url, assign({}, this.opts, opts)) );
 	} else if (Array.isArray(url)) {
 		url.forEach(function(item){
-			this.tasks.push( generator(item, opts) );
+			this.tasks.push( generator(item, assign({}, this.opts, opts)) );
 		}, this);
 	} else {
 		throw new TypeError("Argiment 1: expected string or array");
