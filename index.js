@@ -3,6 +3,7 @@
 var parallel = require('./parallel')
 	, request = require("request")
 	, assign = require('object-assign')
+	, MemoryStream = require('memory-stream')
 	;
 
 /**
@@ -25,21 +26,21 @@ Downloader.prototype = function() {
 	var generator = function(url, opts) {
 		// task func
 		return function(cb) {
-			var data = []
+			var memstream = new MemoryStream()
 				, name = null
 				;
+
+			memstream.on('finish', function() {
+				cb(null, {url:url, filename:name, content:memstream.toBuffer()});
+			});
 
 			request.get(url, opts)
 			.on("error", function(err){
 				cb({url:url, error:err});
 			})
-			.on("data", function(chunk){
-				data.push(chunk);
-			})
 			.on('response', function (res) {
 				if (res.statusCode < 200 || res.statusCode >= 300) {
-					cb({url:url, error: new Error(res.statusCode)});
-					return;
+					return cb({url:url, error: new Error(res.statusCode)});
 				}
 
 				if (res.headers.hasOwnProperty("content-disposition")) {
@@ -48,10 +49,10 @@ Downloader.prototype = function() {
 
 					name = attach.slice(posLeft+1, -1);
 				}
+
+				res.pipe(memstream);
 			})
-			.on("end", function() {
-				cb(null, {url:url, filename:name, content:Buffer.concat(data)});
-			});
+			;
 		};
 	};
 

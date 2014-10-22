@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/reklatsmasters/parallel-download",
   "dependencies": {
+    "memory-stream": "0.0.3",
     "object-assign": "^1.0.0",
     "request": "^2.40.0"
   }
