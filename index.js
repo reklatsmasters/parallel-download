@@ -21,7 +21,7 @@ function Downloader(opts) {
 var generator = function(url, opts) {
 	// task func
 	return function(cb) {
-		var memstream = new MemoryStream()
+		var wstream = opts.stream || new MemoryStream()
 			, name = null
 			, maxSize = 0
 			;
@@ -31,9 +31,23 @@ var generator = function(url, opts) {
 			delete opts.maxSize;
 		}
 
-		memstream.on('finish', function() {
-			cb(null, {url:url, filename:name, content:memstream.toBuffer()});
-		});
+		if (opts.stream) {
+			delete opts.stream;
+		}
+
+		var onFinishStream = function() {
+			var content;
+
+			if (wstream instanceof MemoryStream) {
+				content = wstream.toBuffer();
+			} else {
+				content = new Buffer(0);
+			}
+
+			return cb(null, {url:url, filename:name, content:content});
+		};
+
+		wstream.on('finish', onFinishStream);
 
 		var httpreq = request.get(url, opts)
 		.on("error", function(err){
@@ -60,11 +74,11 @@ var generator = function(url, opts) {
 					if (size > maxSize) {
 						httpreq.abort();
 
-						res.unpipe(memstream);
+						res.unpipe(wstream);
 						res.removeListener('data', dataListener);
 
-						memstream.removeAllListeners();
-						memstream = null;
+						wstream.removeAllListeners('finish');
+						wstream = null;
 
 						return cb({url:url, error:new Error('Exceeds the maximum allowable size of the buffer')});
 					}
@@ -73,7 +87,7 @@ var generator = function(url, opts) {
 				res.on('data', dataListener);
 			}
 
-			res.pipe(memstream);
+			res.pipe(wstream);
 		})
 		;
 	};
