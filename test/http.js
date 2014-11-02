@@ -73,6 +73,42 @@ describe('проверка загрузчика', function () {
 		});
 	});
 
+	it('параллельная загрузка', function(done) {
+		var start = Date.now();
+
+		download(["http://localhost:3555/one", "http://localhost:3555/two"], {mode:"parallel", tryTimeout: 300}, function(err, succ){
+			var end = Date.now();
+
+			should(err).not.be.ok;
+			(err === null).should.be.true;
+			
+			succ.should.be.an.Array;
+			succ.should.have.length(2);
+
+			should(end - start).below(300);
+
+			done();
+		});
+	});
+
+	it('очерёдная загрузка', function(done) {
+		var start = Date.now();
+
+		download(["http://localhost:3555/one", "http://localhost:3555/two"], {mode:"queue", tryTimeout: 300}, function(err, succ){
+			var end = Date.now();
+
+			should(err).not.be.ok;
+			(err === null).should.be.true;
+			
+			succ.should.be.an.Array;
+			succ.should.have.length(2);
+
+			should(end - start).above(300);
+
+			done();
+		});
+	});
+
 	describe('проверка потоков', function(){
 
 		it('внешний буфер-поток', function(done){

@@ -1,10 +1,14 @@
 'use strict';
 
-var parallel = require('./parallel')
-	, request = require("request")
+var request = require("request")
 	, assign = require('object-assign')
 	, MemoryStream = require('memory-stream')
 	;
+
+var jobs = {
+	parallel: require('./parallel'),
+	queue:    require('./queue')
+};
 
 /**
  * @class
@@ -15,6 +19,8 @@ function Downloader(opts) {
 	this.opts.encoding = null;
 	this.opts.timeout = ('timeout' in this.opts) ? this.opts.timeout : 60*1000;
 	this.tasks = [];
+
+	this.mode = ('mode' in this.opts) ? this.opts.mode : "parallel";
 }
 
 // generator of tasks
@@ -138,7 +144,13 @@ Downloader.prototype.get = function(url, opts) {
  * @param {RunCallback} cb
  */
 Downloader.prototype.run = function(cb) {
-	parallel(this.tasks, cb);
+	var opts = {};
+
+	if (this.mode == "queue" && typeof this.opts.tryTimeout === 'number' && this.opts.tryTimeout > 0) {
+		opts.timeout = this.opts.tryTimeout;
+	}
+
+	jobs[this.mode](this.tasks, opts, cb);
 };
 
 

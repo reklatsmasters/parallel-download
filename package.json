@@ -1,7 +1,7 @@
 {
   "name": "parallel-download",
   "version": "0.2.0",
-  "description": "Parallel downloads files to the buffer.",
+  "description": "Parallel or queued downloads files to the buffer.",
   "main": "index.js",
   "scripts": {
     "test": "node ./node_modules/mocha/bin/mocha -r should -R spec"
@@ -12,7 +12,8 @@
   },
   "keywords": [
     "parallel",
-    "download"
+    "download",
+    "queue"
   ],
   "author": "Dmitry Tsvettsikh",
   "license": "MIT",

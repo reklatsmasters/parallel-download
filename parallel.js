@@ -1,8 +1,13 @@
 'use strict';
 
 // based on feross/run-parallel
-module.exports = function (tasks, cb) {
+module.exports = function (tasks, opts, cb) {
   var results, pending, completed, errors = [];
+  
+  if (typeof opts === 'function') {
+    cb = opts;
+  }
+
   if (Array.isArray(tasks)) {
     results = [];
     pending = tasks.length;
