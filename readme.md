@@ -1,5 +1,4 @@
 # parallel-download 
-=========
 [![travis](https://travis-ci.org/ReklatsMasters/parallel-download.svg?style=flat)](https://travis-ci.org/ReklatsMasters/parallel-download) 
 [![npm](https://img.shields.io/npm/v/parallel-download.svg?style=flat)](https://npmjs.org/package/parallel-download) 
 [![license](https://img.shields.io/npm/l/parallel-download.svg?style=flat)](https://npmjs.org/package/parallel-download) 
