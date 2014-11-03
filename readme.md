@@ -1,4 +1,4 @@
-# parallel-download
+# parallel-download [![travis](https://travis-ci.org/ReklatsMasters/parallel-download.svg?style=flat)](https://travis-ci.org/ReklatsMasters/parallel-download) [![npm](https://img.shields.io/npm/v/parallel-download.svg?style=flat)](https://npmjs.org/package/parallel-download) [![license](https://img.shields.io/npm/l/parallel-download.svg?style=flat)](https://npmjs.org/package/parallel-download) [![downloads](https://img.shields.io/npm/dm/parallel-download.svg?style=flat)](https://npmjs.org/package/parallel-download)
 
 > Parallel downloads files to the buffer.
 
@@ -57,6 +57,17 @@ d.run(function(error, success){
 });
 ```
 
+### Queued download
+```js
+var Download = require("parallel-download");
+
+var d = new Download({timeout:30*1000, tryTimeout:500, mode:"queue"});
+d.get(["http://example.com/1.txt", "http://example.com/2.txt"]);
+d.run(function(err, res){
+	// ...
+});
+```
+
 ## API
 
 Methods
@@ -99,19 +110,24 @@ Downloader.run(cb)
 
 **cb**: RunCallback
 
+
 Options
 ===
 
 All [request](https://github.com/mikeal/request) options
 
-stream
------------------------------
+### stream
 **WriteStream**  Default is [memory-stream](https://github.com/tommymessbauer/memory-stream)
 
-
-maxSize
------------------------------
+### maxSize
 **Number** The maximum admissible size of the accepted data. Exceeding this limit all callbacks for the event `finish` removed and the download stops (only for this url).
+
+### mode
+**String** Available values: "parallel" (default) or "queue". Download mode.
+
+### tryTimeout
+**Number** Pause (in ms) between downloads (only for queued mode).
+
 
 Type Definitions
 ===
