@@ -3,6 +3,7 @@
 var request = require("request")
 	, assign = require('object-assign')
 	, MemoryStream = require('memory-stream')
+	, zlib = require("zlib")
 	;
 
 var jobs = {
@@ -71,6 +72,18 @@ var generator = function(url, opts) {
 				name = attach.slice(posLeft+1, -1);
 			}
 
+			var dataStream;
+
+			var contentEncoding = res.headers['content-encoding'] || 'identity'
+			contentEncoding = contentEncoding.trim().toLowerCase();
+
+			if (contentEncoding === 'gzip') {
+				dataStream = zlib.createGunzip();
+				res.pipe(dataStream);
+			} else {
+				dataStream = res;
+			}
+
 			if (maxSize > 0) {
 				var size = 0;
 				var dataListener = function(chunk) {
@@ -80,8 +93,8 @@ var generator = function(url, opts) {
 					if (size > maxSize) {
 						httpreq.abort();
 
-						res.unpipe(wstream);
-						res.removeListener('data', dataListener);
+						dataStream.unpipe(wstream);
+						dataStream.removeListener('data', dataListener);
 
 						wstream.removeAllListeners('finish');
 						wstream = null;
@@ -90,10 +103,10 @@ var generator = function(url, opts) {
 					}
 				};
 
-				res.on('data', dataListener);
+				dataStream.on('data', dataListener);
 			}
 
-			res.pipe(wstream);
+			dataStream.pipe(wstream);
 		})
 		;
 	};
