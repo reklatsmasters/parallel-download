@@ -56,7 +56,7 @@ var generator = function(url, opts) {
 
 		wstream.on('finish', onFinishStream);
 
-		var httpreq = request.get(url, opts)
+		var httpreq = request(url, opts)
 		.on("error", function(err){
 			cb({url:url, error:err});
 		})
