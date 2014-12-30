@@ -24,7 +24,8 @@
   "dependencies": {
     "memory-stream": "0.0.3",
     "object-assign": "^1.0.0",
-    "request": "^2.40.0"
+    "request": "^2.40.0",
+    "run-success": "^1.0.0"
   },
   "devDependencies": {
     "mocha": "^1.21.5",

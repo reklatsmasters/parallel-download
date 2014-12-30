@@ -4,6 +4,7 @@ var request = require("request")
 	, assign = require('object-assign')
 	, MemoryStream = require('memory-stream')
 	, zlib = require("zlib")
+	, success = require('run-success')
 	;
 
 var jobs = {
@@ -19,6 +20,7 @@ function Downloader(opts) {
 	this.opts = opts || {};
 	this.opts.encoding = null;
 	this.opts.timeout = ('timeout' in this.opts) ? this.opts.timeout : 60*1000;
+	this.opts.reps = ('reps' in this.opts) ? this.opts.reps : 1;
 	this.tasks = [];
 
 	this.mode = ('mode' in this.opts) ? this.opts.mode : "parallel";
@@ -119,15 +121,26 @@ var generator = function(url, opts) {
  * @param {object} [opts] - Options for <request>
  */
 Downloader.prototype.get = function(url, opts) {
-	if (typeof url === "string") {
-		this.tasks.push( generator(url, assign({}, this.opts, opts)) );
-	} else if (Array.isArray(url)) {
-		url.forEach(function(item){
-			this.tasks.push( generator(item, assign({}, this.opts, opts)) );
-		}, this);
-	} else {
+	if (!Array.isArray(url) && (typeof url !== 'string')) {
 		throw new TypeError("Argiment 1: expected string or array");
 	}
+
+	var m_opts = assign({}, this.opts, opts);
+	var links = Array.isArray(url) ? url : [url];
+
+	links.forEach(function(link){
+		var task = generator(link, m_opts);
+
+		this.tasks.push(function(cb){
+			success(task, {count:m_opts.reps}, function(err, succ){
+				if (err) {
+					return cb(err);
+				}
+
+				cb(null, succ);
+			});
+		});
+	}, this);
 
 	return this;
 };
@@ -150,7 +163,7 @@ Downloader.prototype.get = function(url, opts) {
 /**
  * @callback RunCallback
  * @param {null|ErrorHash[]} err - Array of errors
- * @param {ResultHash[]} result 
+ * @param {ResultHash[]} result
  */
 
 /**
@@ -171,7 +184,7 @@ Downloader.prototype.run = function(cb) {
  * Simple parallel downloader
  * @param {Url|Url[]} urls
  * @param {object}  [opts]
- * @param {RunCallback} cb  
+ * @param {RunCallback} cb
  */
 function download(urls, opts, cb) {
 	/*jshint validthis:true */
