@@ -133,6 +133,8 @@ All [request](https://github.com/mikeal/request) options
 ### tryTimeout
 **Number** Pause (in ms) between downloads (only for queued mode).
 
+### reps
+**Number** Count (or Infinity) of attempted downloads.
 
 Type Definitions
 ===
