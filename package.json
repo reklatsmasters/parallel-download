@@ -4,7 +4,8 @@
   "description": "Parallel or queued downloads files to the buffer.",
   "main": "index.js",
   "scripts": {
-    "test": "node ./node_modules/mocha/bin/mocha -r should -R spec"
+    "test": "node ./node_modules/mocha/bin/mocha -r should -R spec",
+    "coverage": "istanbul cover --report lcovonly ./node_modules/mocha/bin/_mocha -- -u exports -r should -R spec test/*"
   },
   "repository": {
     "type": "git",

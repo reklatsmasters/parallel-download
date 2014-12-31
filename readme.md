@@ -1,9 +1,10 @@
-# parallel-download 
-[![travis](https://travis-ci.org/ReklatsMasters/parallel-download.svg)](https://travis-ci.org/ReklatsMasters/parallel-download) 
-[![npm](https://img.shields.io/npm/v/parallel-download.svg)](https://npmjs.org/package/parallel-download) 
-[![license](https://img.shields.io/npm/l/parallel-download.svg)](https://npmjs.org/package/parallel-download) 
-[![downloads](https://img.shields.io/npm/dm/parallel-download.svg)](https://npmjs.org/package/parallel-download) 
+# parallel-download
+[![travis](https://travis-ci.org/ReklatsMasters/parallel-download.svg)](https://travis-ci.org/ReklatsMasters/parallel-download)
+[![npm](https://img.shields.io/npm/v/parallel-download.svg)](https://npmjs.org/package/parallel-download)
+[![license](https://img.shields.io/npm/l/parallel-download.svg)](https://npmjs.org/package/parallel-download)
+[![downloads](https://img.shields.io/npm/dm/parallel-download.svg)](https://npmjs.org/package/parallel-download)
 [![Code Climate](https://codeclimate.com/github/ReklatsMasters/parallel-download/badges/gpa.svg)](https://codeclimate.com/github/ReklatsMasters/parallel-download)
+[![Test Coverage](https://codeclimate.com/github/ReklatsMasters/parallel-download/badges/coverage.svg)](https://codeclimate.com/github/ReklatsMasters/parallel-download)
 
 Parallel downloads files to the buffer.
 
@@ -12,7 +13,7 @@ Parallel downloads files to the buffer.
 npm install parallel-download
 ```
 
-## usage 
+## usage
 
 ### Simple download
 ```js
@@ -98,17 +99,17 @@ new Downloader([opts])
 **opts**: object,  optional, Options for request
 
 
-Downloader.get(url, [opts]) 
+Downloader.get(url, [opts])
 -----------------------------
 
 **Parameters**
 
-**url**: Url | Array.&lt;Url&gt;, 
+**url**: Url | Array.&lt;Url&gt;,
 
 **opts**: object, optional, Options for request
 
 
-Downloader.run(cb) 
+Downloader.run(cb)
 -----------------------------
 
 **Parameters**
