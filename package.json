@@ -7,16 +7,18 @@
     "test": "node ./node_modules/mocha/bin/mocha -r should -R spec",
     "coverage": "istanbul cover --report lcovonly ./node_modules/mocha/bin/_mocha -- -u exports -r should -R spec test/*"
   },
+  "engines": {
+    "node": ">=4"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/reklatsmasters/parallel-download.git"
   },
   "keywords": [
     "parallel",
-    "download",
-    "queue"
+    "download"
   ],
-  "author": "Dmitry Tsvettsikh",
+  "author": "Dmitry Tsvettsikh <me@reklatsmasters.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/reklatsmasters/parallel-download/issues"
