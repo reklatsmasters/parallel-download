@@ -3,23 +3,10 @@
 const get = require('simple-get');
 const co  = require('co');
 const url = require('url');
-const attachment = require('content-disposition');
 const concat = require('concat-stream');
 const promisify = require("es6-promisify");
 
 const got = promisify(get);
-
-/**
- * Get filename from content-disposition header
- * @param  {string} contentDisposition header
- * @return {string|null}               filename or null
- */
-function filename(contentDisposition) {
-  return contentDisposition ?
-    attachment.parse(contentDisposition).parameters.filename :
-    null
-  ;
-}
 
 /**
  * chained wrapper around the downloader
@@ -46,7 +33,6 @@ function down(url) {
       })
     })
     .then(res => {
-      res.filename = filename(res.headers['content-disposition']);
       res.url = realUrl;
 
       return res;

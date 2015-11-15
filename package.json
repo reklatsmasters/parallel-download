@@ -27,7 +27,6 @@
   "dependencies": {
     "co": "^4.6.0",
     "concat-stream": "^1.5.1",
-    "content-disposition": "^0.5.0",
     "es6-promisify": "^3.0.0",
     "simple-get": "^1.4.3"
   },
