@@ -6,172 +6,29 @@
 [![Code Climate](https://codeclimate.com/github/ReklatsMasters/parallel-download/badges/gpa.svg)](https://codeclimate.com/github/ReklatsMasters/parallel-download)
 [![Test Coverage](https://codeclimate.com/github/ReklatsMasters/parallel-download/badges/coverage.svg)](https://codeclimate.com/github/ReklatsMasters/parallel-download)
 
-Parallel downloads files to the buffer.
+>Parallel downloads files to the buffer.
 
-## install
+### install
 ```bash
-npm install parallel-download
+npm i parallel-download
 ```
 
-## usage
+### usage
 
-### Simple download
 ```js
-var download = require("parallel-download");
+const pd = require('parallel-download');
 
-download(["http://example.com/1.txt", "http://example.com/2.txt"], function(err, res){
-	console.error(err);
-    res.forEach(function(it){
-    	console.log(it.content.length, it.url);
-    });
-})
+pd(['http://example.com/one', 'http://example.com/two'])
+	.then(res => {/* ... */})
 ```
 
-### Object-oriented download and options
-```js
-var Download = require("parallel-download");
+### Breaking changes between 0.3 and 1.0
 
-var d = new Download({timeout:30*1000});
-d.get("http://example.com/1.txt");
-d.get("http://example.com/2.txt", {timeout:120*1000});
-// OR d.get(["http://example.com/1.txt", "http://example.com/2.txt"]);
-d.run(function(err, res){
-	// ...
-});
-```
+* now work with ES6
+* supports nodejs **>=4**
+* all interfaces used `Promise` instead of callbacks
+* removed `queue` mode and `maxSize`, `tryTimeout`, `stream` options.
+* **extremely small size**
 
-### Streams
-```js
-var Memorystream = require('memory-stream');
-var fs           = require('fs');
-var Download     = require("parallel-download");
-
-var memstream = new Memorystream();
-var fstream = fs.createWriteStream('avatar.png');
-
-var d = new Download();
-
-d.get("http://example.com/1.txt", {stream:memstream});
-d.get("http://example.com/2.png", {stream:fstream});
-
-memstream.on("finish", function(){
-	console.log( memstream.toBuffer() );
-});
-
-d.run(function(error, success){
-	// all done
-});
-```
-
-### Queued download
-```js
-var Download = require("parallel-download");
-
-var d = new Download({timeout:30*1000, tryTimeout:500, mode:"queue"});
-d.get(["http://example.com/1.txt", "http://example.com/2.txt"]);
-d.run(function(err, res){
-	// ...
-});
-```
-
-## API
-
-Methods
-===
-
-download(urls, [opts], cb)
------------------------------
-Download array of urls
-
-**Parameters**
-
-**urls**: Url | Array.&lt;Url&gt;
-
-**opts**: object, optional, Options for request
-
-**cb**: RunCallback
-
-new Downloader([opts])
------------------------------
-
-**Parameters**
-
-**opts**: object,  optional, Options for request
-
-
-Downloader.get(url, [opts])
------------------------------
-
-**Parameters**
-
-**url**: Url | Array.&lt;Url&gt;,
-
-**opts**: object, optional, Options for request
-
-
-Downloader.run(cb)
------------------------------
-
-**Parameters**
-
-**cb**: RunCallback
-
-
-Options
-===
-
-All [request](https://github.com/mikeal/request) options
-
-### stream
-**WriteStream**  Default is [memory-stream](https://github.com/tommymessbauer/memory-stream)
-
-### maxSize
-**Number** The maximum admissible size of the accepted data. Exceeding this limit all callbacks for the event `finish` removed and the download stops (only for this url).
-
-### mode
-**String** Available values: "parallel" (default) or "queue". Download mode.
-
-### tryTimeout
-**Number** Pause (in ms) between downloads (only for queued mode).
-
-### reps
-**Number** Count (or Infinity) of attempted downloads.
-
-Type Definitions
-===
-
-RunCallback(err, result)
------------------------------
-
-**Parameters**
-
-| Name | Type | Description |
-|------|------|-------------|
-| err | null : Array.&lt;ErrorHash&gt; | Array of errors |
-| result | Array.&lt;ResultHash&gt; | Callback with downloaded data |
-
-
-ErrorHash
------------------------------
-
-**Type**: object
-
-**Properties**
-
-| Name | Type | Description |
-|------|------|-------------|
-| url | String | link |
-| error | Error | Error object |
-
-ResultHash
------------------------------
-
-**Type**: object
-
-**Properties**
-
-| Name | Type | Description |
-|------|------|-------------|
-| url | String | link |
-| content | Buffer | Downloaded data or empty Buffer when used external stream |
-|filename | null : String | File name from `content-disposition` header |
+### License
+MIT, 2015 (c) Dmitry Tsvettsikh
