@@ -1,210 +1,83 @@
 'use strict';
 
-var request = require("request")
-	, assign = require('object-assign')
-	, MemoryStream = require('memory-stream')
-	, zlib = require("zlib")
-	, success = require('run-success')
-	;
+const get = require('simple-get');
+const co  = require('co');
+const url = require('url');
+const attachment = require('content-disposition');
+const concat = require('concat-stream');
+const promisify = require("es6-promisify");
 
-var jobs = {
-	parallel: require('./parallel'),
-	queue:    require('./queue')
-};
+const got = promisify(get);
 
 /**
- * @class
- * @param {object} [opts] - Options for <request>
+ * Get filename from content-disposition header
+ * @param  {string} contentDisposition header
+ * @return {string|null}               filename or null
  */
-function Downloader(opts) {
-	this.opts = opts || {};
-	this.opts.encoding = null;
-	this.opts.timeout = ('timeout' in this.opts) ? this.opts.timeout : 60*1000;
-	this.opts.reps = ('reps' in this.opts) ? this.opts.reps : 1;
-	this.tasks = [];
-
-	this.mode = ('mode' in this.opts) ? this.opts.mode : "parallel";
+function filename(contentDisposition) {
+  return contentDisposition ?
+    attachment.parse(contentDisposition).parameters.filename :
+    null
+  ;
 }
 
-// generator of tasks
-var generator = function(url, opts) {
-	// task func
-	return function(cb) {
-		var wstream = opts.stream || new MemoryStream()
-			, name = null
-			, maxSize = 0
-			;
-
-		if (typeof opts.maxSize === 'number' && opts.maxSize > 0) {
-			maxSize = opts.maxSize;
-			delete opts.maxSize;
-		}
-
-		if (opts.stream) {
-			delete opts.stream;
-		}
-
-		var onFinishStream = function() {
-			var content;
-
-			if (wstream instanceof MemoryStream) {
-				content = wstream.toBuffer();
-			} else {
-				content = new Buffer(0);
-			}
-
-			return cb(null, {url:url, filename:name, content:content});
-		};
-
-		wstream.on('finish', onFinishStream);
-
-		var httpreq = request(url, opts)
-		.on("error", function(err){
-			cb({url:url, error:err});
-		})
-		.on('response', function (res) {
-			if (res.statusCode < 200 || res.statusCode >= 300) {
-				return cb({url:url, error: new Error(res.statusCode)});
-			}
-
-			if (res.headers.hasOwnProperty("content-disposition")) {
-				var attach = res.headers["content-disposition"];
-				var posLeft = attach.indexOf('"');
-
-				name = attach.slice(posLeft+1, -1);
-			}
-
-			var dataStream;
-
-			var contentEncoding = res.headers['content-encoding'] || 'identity'
-			contentEncoding = contentEncoding.trim().toLowerCase();
-
-			if (contentEncoding === 'gzip') {
-				dataStream = zlib.createGunzip();
-				res.pipe(dataStream);
-			} else {
-				dataStream = res;
-			}
-
-			if (maxSize > 0) {
-				var size = 0;
-				var dataListener = function(chunk) {
-					var part = Buffer.isBuffer(chunk) ? chunk : new Buffer(chunk);
-					size += part.length;
-
-					if (size > maxSize) {
-						httpreq.abort();
-
-						dataStream.unpipe(wstream);
-						dataStream.removeListener('data', dataListener);
-
-						wstream.removeAllListeners('finish');
-						wstream = null;
-
-						return cb({url:url, error:new Error('Exceeds the maximum allowable size of the buffer')});
-					}
-				};
-
-				dataStream.on('data', dataListener);
-			}
-
-			dataStream.pipe(wstream);
-		})
-		;
-	};
-};
-
-/* @typedef {string} Url */
-
 /**
- * @param {Url|Url[]} url
- * @param {object} [opts] - Options for <request>
+ * chained wrapper around the downloader
+ * @param  {string|object} url url or request config
+ * @return {Promise}     promise, resolved to IncomingMessage or null
  */
-Downloader.prototype.get = function(url, opts) {
-	if (!Array.isArray(url) && (typeof url !== 'string')) {
-		throw new TypeError("Argiment 1: expected string or array");
-	}
+function down(url) {
+  var realUrl = (typeof url == 'string') ? url : url.url;
 
-	var m_opts = assign({}, this.opts, opts);
-	var links = Array.isArray(url) ? url : [url];
+  return got(url)
+    .then(res => {
+      if (~~(res.statusCode / 100) != 2) {
+        return Promise.reject(new Error(res.statusCode));
+      }
 
-	links.forEach(function(link){
-		var task = generator(link, m_opts);
+      return res;
+    })
+    .then(res => {
+      return new Promise(resolve => {
+        res.pipe(concat(data => {
+          res.content = data;
+          resolve(res);
+        }))
+      })
+    })
+    .then(res => {
+      res.filename = filename(res.headers['content-disposition']);
+      res.url = realUrl;
 
-		this.tasks.push(function(cb){
-			success(task, {count:m_opts.reps}, function(err, succ){
-				if (err) {
-					return cb(err);
-				}
-
-				cb(null, succ);
-			});
-		});
-	}, this);
-
-	return this;
-};
-
-/**
- * @typedef ResultHash
- * @type {object}
- * @property {Url} url
- * @property {Buffer} content - Downloaded data
- * @property {null|String} filename - File name from `content-disposition` header
- */
-
- /**
-  * @typedef ErrorHash
-  * @type {object}
-  * @property {Url} url
-  * @property {Error} error
-  */
-
-/**
- * @callback RunCallback
- * @param {null|ErrorHash[]} err - Array of errors
- * @param {ResultHash[]} result
- */
-
-/**
- * @param {RunCallback} cb
- */
-Downloader.prototype.run = function(cb) {
-	var opts = {};
-
-	if (this.mode == "queue" && typeof this.opts.tryTimeout === 'number' && this.opts.tryTimeout > 0) {
-		opts.timeout = this.opts.tryTimeout;
-	}
-
-	jobs[this.mode](this.tasks, opts, cb);
-};
-
-
-/**
- * Simple parallel downloader
- * @param {Url|Url[]} urls
- * @param {object}  [opts]
- * @param {RunCallback} cb
- */
-function download(urls, opts, cb) {
-	/*jshint validthis:true */
-	if (this instanceof download) {
-		opts = opts || urls;
-		return new Downloader(opts);
-	}
-
-	if (!Array.isArray(urls) && (typeof urls !== "string")) {
-		throw new TypeError("Expected string or array");
-	}
-
-	if (typeof opts === "function") {
-		cb = opts;
-		opts = {};
-	}
-
-	var d = new Downloader(opts);
-	d.get(urls);
-	d.run(cb);
+      return res;
+    })
+    .catch(err => {
+      err.url = realUrl;
+      return err;
+    })
+  ;
 }
 
-module.exports = download;
+/**
+ * download files in parallel
+ * @param  {array} urls array of urls to download
+ * @return {Promise} array with responses than success downloaded
+ */
+function* download(_urls) {
+  var urls = Array.isArray(_urls) ? _urls : [_urls];
+  var status = yield urls.map(down);
+
+  var success = [], error = [];
+
+  for(let res of status) {
+    let choice = (res instanceof Error) ? error : success;
+    choice.push(res);
+  }
+
+  status.length = 0;
+  success.error = error;
+
+  return success;
+}
+
+module.exports = co.wrap(download);

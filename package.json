@@ -4,8 +4,8 @@
   "description": "Parallel or queued downloads files to the buffer.",
   "main": "index.js",
   "scripts": {
-    "test": "node ./node_modules/mocha/bin/mocha -r should -R spec",
-    "coverage": "istanbul cover --report lcovonly ./node_modules/mocha/bin/_mocha -- -u exports -r should -R spec test/*"
+    "test": "node ./node_modules/mocha/bin/mocha  -r should -r should-promised -R spec",
+    "coverage": "istanbul cover --report lcovonly ./node_modules/mocha/bin/_mocha -- -u exports  -r should -r should-promised -R spec test/*"
   },
   "engines": {
     "node": ">=4"
@@ -25,13 +25,15 @@
   },
   "homepage": "https://github.com/reklatsmasters/parallel-download",
   "dependencies": {
-    "memory-stream": "0.0.3",
-    "object-assign": "^1.0.0",
-    "request": "^2.40.0",
-    "run-success": "^1.0.0"
+    "co": "^4.6.0",
+    "concat-stream": "^1.5.1",
+    "content-disposition": "^0.5.0",
+    "es6-promisify": "^3.0.0",
+    "simple-get": "^1.4.3"
   },
   "devDependencies": {
-    "mocha": "^1.21.5",
-    "should": "^4.1.0"
+    "mocha": "^2.3.3",
+    "should": "^7.1.1",
+    "should-promised": "^0.3.1"
   }
 }
