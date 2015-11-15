@@ -76,6 +76,24 @@ describe('func download', () => {
 			res.error[0].url.should.be.eql(url3);
 		})
 	})
+
+	describe('retries', function() {
+		this.timeout(5e3);
+
+		var timeout = 1e3; // 1s
+
+		it('decrease var', () => {
+			var opts = {url: "http://example.com/error", retries: 2};
+
+			return download(opts)
+				.then(res => {
+					res.should.be.empty();
+					res.error.should.have.length(1);
+					opts.retries.should.be.eql(0);
+				})
+			;
+		})
+	})
 });
 
 describe('parallel mode', () => {

@@ -14,7 +14,10 @@ const got = promisify(get);
  * @return {Promise}     promise, resolved to IncomingMessage or null
  */
 function down(url) {
+  var retries = url.retries || 1;
+
   var realUrl = (typeof url == 'string') ? url : url.url;
+  var opts = (typeof url == 'string') ? {url, retries} : url;
 
   return got(url)
     .then(res => {
@@ -38,8 +41,12 @@ function down(url) {
       return res;
     })
     .catch(err => {
-      err.url = realUrl;
-      return err;
+      if (--opts.retries <= 0) {
+        err.url = realUrl;
+        return err;
+      }
+
+      return down(opts);
     })
   ;
 }
