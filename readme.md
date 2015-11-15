@@ -5,6 +5,9 @@
 [![downloads](https://img.shields.io/npm/dm/parallel-download.svg)](https://npmjs.org/package/parallel-download)
 [![Code Climate](https://codeclimate.com/github/ReklatsMasters/parallel-download/badges/gpa.svg)](https://codeclimate.com/github/ReklatsMasters/parallel-download)
 [![Test Coverage](https://codeclimate.com/github/ReklatsMasters/parallel-download/badges/coverage.svg)](https://codeclimate.com/github/ReklatsMasters/parallel-download)
+[![bitHound Score](https://www.bithound.io/github/ReklatsMasters/parallel-download/badges/score.svg)](https://www.bithound.io/github/ReklatsMasters/parallel-download)
+[![bitHound Dependencies](https://www.bithound.io/github/ReklatsMasters/parallel-download/badges/dependencies.svg)](https://www.bithound.io/github/ReklatsMasters/parallel-download/master/dependencies/npm)
+
 
 >Parallel downloads files to the buffer.
 
