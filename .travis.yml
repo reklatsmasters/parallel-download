@@ -4,7 +4,7 @@ node_js:
   - "4.0"
 
 before_install:
-  - "npm install -g istanbul codeclimate-test-reporter"
+  - "npm install -g codeclimate-test-reporter"
 
 addons:
   code_climate:
@@ -14,4 +14,4 @@ script:
   - "npm run coverage"
 
 after_script:
-  - "cat ./coverage/lcov.info | codeclimate"
+  - "cat ./coverage/lcov.info | codeclimate-test-reporter"
