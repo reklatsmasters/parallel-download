@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node ./node_modules/mocha/bin/mocha  -r should -r should-promised -R spec",
-    "coverage": "istanbul cover --report lcovonly ./node_modules/mocha/bin/_mocha -- -u exports  -r should -r should-promised -R spec test/*"
+    "coverage": "babel-istanbul cover --report lcovonly ./node_modules/mocha/bin/_mocha -- -u exports  -r should -r should-promised -R spec test/*"
   },
   "engines": {
     "node": ">=4"
@@ -32,6 +32,8 @@
     "simple-get": "^1.4.3"
   },
   "devDependencies": {
+    "babel-core": "^6.1.21",
+    "babel-istanbul": "^0.5.8",
     "mocha": "^2.3.3",
     "should": "^7.1.1",
     "should-promised": "^0.3.1"
