@@ -1,0 +1,19 @@
+{
+  "ecmaFeatures": {
+    "blockBindings": true,
+    "arrowFunctions": true,
+    "templateStrings": true
+  },
+  "env": {
+    "browser": false,
+    "node": true,
+    "amd": true,
+    "es6": true
+  },
+  "rules": {
+    "quotes": 0,
+    "no-undef": 2,
+    "no-extra-semi": 1,
+    "no-underscore-dangle": 0
+  }
+}
