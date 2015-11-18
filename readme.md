@@ -9,12 +9,20 @@
 [![bitHound Dependencies](https://www.bithound.io/github/ReklatsMasters/parallel-download/badges/dependencies.svg)](https://www.bithound.io/github/ReklatsMasters/parallel-download/master/dependencies/npm)
 
 
->Parallel downloads files to the buffer.
+>Download files in parallel to the buffer
 
 ### install
 ```bash
 npm i parallel-download
 ```
+
+### features
+
+* work with super small http library [simple-get](https://github.com/feross/simple-get)
+* work with ES6
+* supports nodejs **>=4**
+* `Promise` instead of callbacks
+* **extremely small size** (< 100 lines of code)
 
 ### usage
 
@@ -25,13 +33,30 @@ pd(['http://example.com/one', 'http://example.com/two'])
 	.then(res => {/* ... */})
 ```
 
+### API
+
+* `pd(url [, opts])`
+###### param url (String|Array[String]|Object|Array[Object])
+url/config or array of urls/configs
+
+###### param opts (Object)
+shared config, has a low priority
+
+```js
+pd({url:"http://example.com/", timeout: 5e3}, {timeout:10e3})
+	.then(/* ... */);
+// timeout is 5e3
+```
+
+###### return res (Promise.Array)
+This promise always resolved. Promise contains an array of [IncomingMessage](http://nodejs.org/api/http.html#http_http_incomingmessage) instances with additional fields:
+* url (string) - original request url (*for identify each request*)
+* content (Buffer) - ungzipped (if need) response (*or you can use res.pipe*)
+
 ### Breaking changes between 0.3 and 1.0
 
-* now work with ES6
-* supports nodejs **>=4**
-* all interfaces used `Promise` instead of callbacks
+* 100% rewrited
 * removed `queue` mode and `maxSize`, `tryTimeout`, `stream` options.
-* **extremely small size**
 
 ### License
 MIT, 2015 (c) Dmitry Tsvettsikh
