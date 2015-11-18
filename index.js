@@ -5,21 +5,29 @@ const co  = require('co');
 const url = require('url');
 const concat = require('concat-stream');
 const promisify = require("es6-promisify");
+const extend = require('xtend');
+const timeout = require('timed-out');
 
-const got = promisify(get);
+const got = promisify(function(opts, cb) {
+  var req = get(opts, cb);
+  timeout(req, opts.timeout || 60e3)
+});
+
+const isString = (s) => typeof s === 'string';
 
 /**
  * chained wrapper around the downloader
- * @param  {string|object} url url or request config
+ * @param  {object} opts request config
  * @return {Promise}     promise, resolved to IncomingMessage or null
  */
-function down(url) {
-  var retries = url.retries || 1;
+function down(opts) {
+  if (!opts.hasOwnProperty('retries')) {
+    opts.retries = 1;
+  }
 
-  var realUrl = (typeof url == 'string') ? url : url.url;
-  var opts = (typeof url == 'string') ? {url, retries} : url;
+  var url = opts.url;
 
-  return got(url)
+  return got(opts)
     .then(res => {
       if (~~(res.statusCode / 100) != 2) {
         return Promise.reject(new Error(res.statusCode));
@@ -36,13 +44,13 @@ function down(url) {
       })
     })
     .then(res => {
-      res.url = realUrl;
+      res.url = url;
 
       return res;
     })
     .catch(err => {
       if (--opts.retries <= 0) {
-        err.url = realUrl;
+        err.url = url;
         return err;
       }
 
@@ -53,12 +61,14 @@ function down(url) {
 
 /**
  * download files in parallel
- * @param  {array} urls array of urls to download
+ * @param  {array} _urls array of urls to download
+ * @param {object} _opts [optional] shared config 
  * @return {Promise} array with responses than success downloaded
  */
-function* download(_urls) {
+function* download(_urls, _opts) {
+  var opts = _opts || {};
   var urls = Array.isArray(_urls) ? _urls : [_urls];
-  var status = yield urls.map(down);
+  var status = yield urls.map(url => down( extend(opts, isString(url) ? {url} : url ) ));
 
   var success = [], error = [];
 
