@@ -77,6 +77,28 @@ describe('func download', () => {
 		})
 	})
 
+  it('should fork fastest, then timeout', function() {
+    this.timeout(5e3);
+
+    const timeout = 5e2;
+    const start = Date.now();
+    const url = "http://localhost:5555/one/two";
+
+    return download(url, {timeout})
+      .then((res) => {
+        const end = Date.now();
+
+        process.nextTick(function() {
+          should(end - start).below(timeout);
+
+          res.should.have.property('error');
+          res.error.should.be.an.Array().and.have.length(1);
+          res.error[0].should.be.instanceof(Error);
+          res.error[0].url.should.be.eql(url);
+        })
+      })
+  })
+
 	describe('timeout', function() {
 		this.timeout(5e3);
 		var app;
@@ -163,40 +185,40 @@ describe('func download', () => {
 			;
 		})
 	})
+
+  describe('parallel mode', () => {
+    var app;
+    const timeout = 400;
+
+    before(function(done){
+      app = http.createServer(function(req, res) {
+        res.writeHead(200, {'Content-Type':'text/plain'});
+
+        setTimeout(() => {
+          res.end(new Buffer(Math.random().toString()));
+        }, timeout);
+      });
+
+      app.listen(3355, function(){
+        done();
+      });
+    });
+
+    after(function(done){
+      app.close(function(){
+        done();
+      });
+    });
+
+    it('should work', () => {
+      var url1 = "http://localhost:3355/one?q=1&w=2";
+      var url2 = "http://localhost:3355/one/two";
+
+      var start = Date.now();
+      return download([url1, url2]).then(() => {
+        var end = Date.now();
+        should(end - start).below(timeout * 2);
+      })
+    })
+  })
 });
-
-describe('parallel mode', () => {
-	var app;
-	const timeout = 400;
-
-	before(function(done){
-		app = http.createServer(function(req, res) {
-			res.writeHead(200, {'Content-Type':'text/plain'});
-
-			setTimeout(() => {
-				res.end(new Buffer(Math.random().toString()));
-			}, timeout);
-		});
-
-		app.listen(3355, function(){
-			done();
-		});
-	});
-
-	after(function(done){
-		app.close(function(){
-			done();
-		});
-	});
-
-	it('should work', () => {
-		var url1 = "http://localhost:3355/one?q=1&w=2";
-		var url2 = "http://localhost:3355/one/two";
-
-		var start = Date.now();
-		return download([url1, url2]).then(() => {
-			var end = Date.now();
-			should(end - start).below(timeout * 2);
-		})
-	})
-})
