@@ -1,6 +1,6 @@
 {
   "name": "parallel-download",
-  "version": "1.0.0-1",
+  "version": "1.0.0",
   "description": "Parallel or queued downloads files to the buffer.",
   "main": "index.js",
   "scripts": {
