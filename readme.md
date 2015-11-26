@@ -37,7 +37,8 @@ pd(['http://example.com/one', 'http://example.com/two'])
 
 * `pd(url [, opts])`
 
-###### param url (String|Array<String>|Object|Array<Object>)
+###### param url (String|Array[String]|Object|Array[Object])
+
 url/config or array of urls/configs
 
 ###### param opts (Object)
@@ -56,7 +57,7 @@ additional fields:
 * content (Buffer) - ungzipped (if need) response (*or you can use res.pipe*)
 
 Resolved array contain fields:
-* error (Array<Error>)
+* error (Array[Error])
 
 Each error object contain fields:
 * all standart fields
