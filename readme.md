@@ -36,7 +36,8 @@ pd(['http://example.com/one', 'http://example.com/two'])
 ### API
 
 * `pd(url [, opts])`
-###### param url (String|Array[String]|Object|Array[Object])
+
+###### param url (String|Array<String>|Object|Array<Object>)
 url/config or array of urls/configs
 
 ###### param opts (Object)
@@ -48,10 +49,19 @@ pd({url:"http://example.com/", timeout: 5e3}, {timeout:10e3})
 // timeout is 5e3
 ```
 
-###### return res (Promise.Array)
-This promise always resolved. Promise contains an array of [IncomingMessage](http://nodejs.org/api/http.html#http_http_incomingmessage) instances with additional fields:
+###### return res (Promise<Array>)
+This promise **always** resolved. Promise contains an array of [IncomingMessage](http://nodejs.org/api/http.html#http_http_incomingmessage) instances with
+additional fields:
 * url (string) - original request url (*for identify each request*)
 * content (Buffer) - ungzipped (if need) response (*or you can use res.pipe*)
+
+Resolved array contain fields:
+* error (Array<Error>)
+
+Each error object contain fields:
+* all standart fields
+* url (string) - original request url (*for identify each request*)
+
 
 ### Breaking changes between 0.3 and 1.0
 
