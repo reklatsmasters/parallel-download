@@ -62,7 +62,7 @@ function down(opts) {
 /**
  * download files in parallel
  * @param  {array} _urls array of urls to download
- * @param {object} _opts [optional] shared config 
+ * @param {object} _opts [optional] shared config
  * @return {Promise} array with responses than success downloaded
  */
 function* download(_urls, _opts) {
@@ -73,8 +73,8 @@ function* download(_urls, _opts) {
   var success = [], error = [];
 
   for(let res of status) {
-    let choice = (res instanceof Error) ? error : success;
-    choice.push(res);
+    let select = (res instanceof Error) ? error : success;
+    select.push(res);
   }
 
   status.length = 0;
