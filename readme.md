@@ -39,7 +39,11 @@ pd(['http://example.com/one', 'http://example.com/two'])
 
 ###### param url (String|Array[String]|Object|Array[Object])
 
-url/config or array of urls/configs
+Url/config or array of urls/configs. Available options:
+
+   * all options of [simple-get](https://github.com/feross/simple-get)
+   * `timeout` - download timeout, default none
+   * `retries` - redownload on error, default 1
 
 ###### param opts (Object)
 shared config, has a low priority
