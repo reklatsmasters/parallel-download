@@ -1,19 +1,13 @@
 {
-  "ecmaFeatures": {
-    "blockBindings": true,
-    "arrowFunctions": true,
-    "templateStrings": true
-  },
+  "extends": "eslint:recommended",
   "env": {
-    "browser": false,
     "node": true,
+    "browser": true,
     "amd": true,
     "es6": true
   },
   "rules": {
     "quotes": 0,
-    "no-undef": 2,
-    "no-extra-semi": 1,
-    "no-underscore-dangle": 0
+    "no-mixed-spaces-and-tabs": 0
   }
 }
