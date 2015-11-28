@@ -67,6 +67,7 @@ Resolved array contain fields:
 Each error object contain fields:
 * all standart fields
 * url (string) - original request url (*for identify each request*)
+* response (IncomingMessage) - original server response
 
 
 ### Breaking changes between 0.3 and 1.0
