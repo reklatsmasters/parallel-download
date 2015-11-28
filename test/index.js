@@ -221,4 +221,11 @@ describe('func download', () => {
       })
     })
   })
+	
+	it('follow errors', () => {
+		var url = "http://localhost:5555/one";
+		var promise = download(url, { followErrors: true, timeout:1e3 });
+		
+		return promise.should.be.a.Promise().and.rejected;
+	})
 });

@@ -53,7 +53,7 @@ function down(opts) {
     .catch(err => {
       if (--opts.retries <= 0) {
         err.url = url;
-        return err;
+        return opts.followErrors ? Promise.reject(err) : err;
       }
 
       return down(opts);

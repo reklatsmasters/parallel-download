@@ -44,6 +44,7 @@ Url/config or array of urls/configs. Available options:
    * all options of [simple-get](https://github.com/feross/simple-get)
    * `timeout` - download timeout, default none
    * `retries` - redownload on error, default 1
+	 * `followErrors` - don't catch errors. **Attention** All pending requests will not aborted!
 
 ###### param opts (Object)
 shared config, has a low priority
