@@ -1,7 +1,7 @@
 {
   "name": "parallel-download",
   "version": "1.0.0",
-  "description": "Parallel or queued downloads files to the buffer.",
+  "description": "Download files in parallel to the buffer",
   "main": "index.js",
   "scripts": {
     "test": "node ./node_modules/mocha/bin/mocha  -r should -r should-promised -R spec",
