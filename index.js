@@ -2,10 +2,8 @@
 
 const get = require('simple-get');
 const co  = require('co');
-const url = require('url');
 const concat = require('concat-stream');
 const promisify = require("es6-promisify");
-const extend = require('xtend');
 const timeout = require('timed-out');
 
 const got = promisify(function(opts, cb) {
@@ -70,7 +68,7 @@ function down(opts) {
 function* download(_urls, _opts) {
   var opts = _opts || {};
   var urls = Array.isArray(_urls) ? _urls : [_urls];
-  var status = yield urls.map(url => down( extend(opts, isString(url) ? {url} : url ) ));
+  var status = yield urls.map(url => down( Object.assign(opts, isString(url) ? {url} : url) ));
 
   var success = [], error = [];
 

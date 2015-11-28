@@ -29,8 +29,7 @@
     "concat-stream": "^1.5.1",
     "es6-promisify": "^3.0.0",
     "simple-get": "^1.4.3",
-    "timed-out": "^2.0.0",
-    "xtend": "^4.0.1"
+    "timed-out": "^2.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.1.21",
