@@ -30,7 +30,9 @@ function down(opts) {
   return got(opts)
     .then(res => {
       if (~~(res.statusCode / 100) != 2) {
-        return Promise.reject(new Error(res.statusCode));
+        let err = new Error(res.statusCode);
+        err.response = res;
+        return Promise.reject(err);
       }
 
       return res;

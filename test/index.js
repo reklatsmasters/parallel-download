@@ -72,7 +72,7 @@ describe('func download', () => {
 
 			res.should.have.property('error');
 			res.error.should.be.an.Array().and.have.length(1);
-			res.error[0].should.be.instanceof(Error);
+			res.error[0].should.be.instanceof(Error).and.have.keys('url', 'response');
 			res.error[0].url.should.be.eql(url3);
 		})
 	})
