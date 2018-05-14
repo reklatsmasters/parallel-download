@@ -1,3 +1,9 @@
+# DEPRECATED
+
+Use [`Promise.all`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all) or smart promise queues like [`p-queue`](https://www.npmjs.com/package/p-queue) instead. Please, let me known if you want to take this package name.
+
+---
+
 # parallel-download
 [![travis](https://travis-ci.org/ReklatsMasters/parallel-download.svg)](https://travis-ci.org/ReklatsMasters/parallel-download)
 [![npm](https://img.shields.io/npm/v/parallel-download.svg)](https://npmjs.org/package/parallel-download)
